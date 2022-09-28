@@ -16,3 +16,71 @@ img {
   display: block;
   max-width: 100%;
 }
+
+.switcher {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  color: #fff;
+}
+.switcher__button{
+  background-color: dodgerblue;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+}
+
+.switcher__button:hover {
+    background-color: steelblue;
+}
+
+.switcher__button:first-child {
+  margin-right: 20px;
+}
+
+.switcher__button:disabled {
+  background-color: lightsteelblue;
+  color: grey;
+}
+
+.timer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  width: 225px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.field .value {
+  font-size: 34px;
+}
+
+.field .label {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+  form {
+    display: flex;
+    width: 680px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  form input {
+    display: block;
+  }
+
+  form button {
+    align-self: flex-end;
+  }
