@@ -11,9 +11,10 @@ const refs = {
   secondsEl: document.querySelector('.value[data-seconds]'),
 };
 
-let nowDateNum = 0;
-let selectedDateNum = 0;
+let nowDateId = 0;
+let selectedDateId = 0;
 let timeDifference = 0;
+let timeDifferenceObject = {};
 
 refs.buttonEl.disabled = true;
 refs.buttonEl.addEventListener('click', onClickCountTime);
@@ -25,17 +26,25 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    nowDateNum = Date.now();
-    selectedDateNum = Number(selectedDates[0]);
-    checkDate(nowDateNum, selectedDateNum);
+    const nowDate = new Date();
+    nowDateId = nowDate.getTime();
+    selectedDateId = selectedDates[0].getTime();
+    checkDate(nowDateId, selectedDateId);
   },
 };
 
 function checkDate(now, selected) {
+  if (timeDifference !== 0) {
+    refs.buttonEl.disabled = true;
+    return;
+  }
+
   const { buttonEl } = refs;
+
   if (now < selected) {
     buttonEl.disabled = false;
-    timeDifference = convertMs(selected - now);
+    timeDifference = selected - now;
+    timeDifferenceObject = convertMs(timeDifference);
   } else {
     buttonEl.disabled = true;
     Notify.failure('Please, choose date in the future');
@@ -60,7 +69,7 @@ const addLeadingZero = value => value.toString().padStart(2, '0');
 
 function printDate() {
   const { daysEl, hoursEl, minutesEl, secondsEl } = refs;
-  const { days, hours, minutes, seconds } = timeDifference;
+  const { days, hours, minutes, seconds } = timeDifferenceObject;
 
   daysEl.textContent = days > 10 ? days : addLeadingZero(days);
   hoursEl.textContent = hours > 10 ? hours : addLeadingZero(hours);
@@ -71,6 +80,16 @@ function printDate() {
 function onClickCountTime() {
   refs.buttonEl.disabled = true;
   printDate();
+  const timer = setInterval(newDatePrint, 1000);
+
+  function newDatePrint() {
+    timeDifferenceObject = convertMs((timeDifference -= 1000));
+    printDate();
+    if (timeDifference < 1000) {
+      clearInterval(timer);
+      timeDifference = 0;
+    }
+  }
 }
 
 flatpickr('input#datetime-picker', options);
