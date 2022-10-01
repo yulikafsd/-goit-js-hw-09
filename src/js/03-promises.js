@@ -5,28 +5,37 @@ const refs = {
   buttonEl: document.querySelector('button'),
 };
 
-refs.formEl.addEventListener('submit', createPromise);
+refs.formEl.addEventListener('submit', onSubmit);
 
-const delay = refs.formEl.elements.delay.value;
-const step = refs.formEl.elements.step.value;
-const amount = refs.formEl.elements.amount.value;
+function onSubmit(e) {
+  e.preventDefault();
+  let delay = Number(refs.formEl.elements.delay.value);
+  const step = Number(refs.formEl.elements.step.value);
+  const amount = Number(refs.formEl.elements.amount.value);
+  const delaysArr = [];
 
-function createPromise(event, position, delay) {
-  event.preventDefault();
-  const shouldResolve = Math.random() > 0.3;
-  if (shouldResolve) {
-    // Fulfill
-    Notify.success(`Fulfilled promise ${position} in ${delay}ms`);
-  } else {
-    // Reject
-    Notify.failure(`Rejected promise ${position} in ${delay}ms`);
+  for (let position = 0; position < amount; position += 1) {
+    setTimeout(() => {
+      const shouldResolve = Math.random() > 0.3;
+      if (shouldResolve) {
+        Notify.success(
+          `Fulfilled promise ${position + 1} in ${delaysArr[position]}ms`
+        );
+      } else {
+        Notify.failure(
+          `Rejected promise ${position + 1} in ${delaysArr[position]}ms`
+        );
+      }
+    }, delay);
+    delaysArr.push(delay);
+    delay += step;
   }
 }
 
 // createPromise(2, 1500)
 //   .then(({ position, delay }) => {
-//     Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
+//     Notify.success(`Fulfilled promise ${position} in ${delay}ms`);
 //   })
 //   .catch(({ position, delay }) => {
-//     Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
+//     Notify.failure(`Rejected promise ${position} in ${delay}ms`);
 //   });

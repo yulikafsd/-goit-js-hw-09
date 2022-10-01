@@ -11,13 +11,13 @@ const refs = {
   secondsEl: document.querySelector('.value[data-seconds]'),
 };
 
-let nowDateId = 0;
-let selectedDateId = 0;
-let timeDifference = 0;
-let timeDifferenceObject = {};
+const { inputEl, buttonEl, daysEl, hoursEl, minutesEl, secondsEl } = refs;
 
-refs.buttonEl.disabled = true;
-refs.buttonEl.addEventListener('click', onClickCountTime);
+let delta = 0;
+let deltaObject = {};
+
+buttonEl.disabled = true;
+buttonEl.addEventListener('click', onClickCountTime);
 
 const options = {
   enableTime: true,
@@ -26,25 +26,22 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    const nowDate = new Date();
-    nowDateId = nowDate.getTime();
-    selectedDateId = selectedDates[0].getTime();
-    checkDate(nowDateId, selectedDateId);
+    const selectedDate = selectedDates[0];
+    checkDate(selectedDate);
   },
 };
 
-function checkDate(now, selected) {
-  if (timeDifference !== 0) {
-    refs.buttonEl.disabled = true;
+function checkDate(selected) {
+  if (delta !== 0) {
+    buttonEl.disabled = true;
+    Notify.warning('Please, wait for timer to finish');
     return;
   }
 
-  const { buttonEl } = refs;
-
-  if (now < selected) {
+  if (new Date() < selected) {
     buttonEl.disabled = false;
-    timeDifference = selected - now;
-    timeDifferenceObject = convertMs(timeDifference);
+    delta = selected - new Date();
+    // deltaObject = convertMs(delta);
   } else {
     buttonEl.disabled = true;
     Notify.failure('Please, choose date in the future');
@@ -68,8 +65,7 @@ function convertMs(ms) {
 const addLeadingZero = value => value.toString().padStart(2, '0');
 
 function printDate() {
-  const { daysEl, hoursEl, minutesEl, secondsEl } = refs;
-  const { days, hours, minutes, seconds } = timeDifferenceObject;
+  const { days, hours, minutes, seconds } = deltaObject;
 
   daysEl.textContent = days > 10 ? days : addLeadingZero(days);
   hoursEl.textContent = hours > 10 ? hours : addLeadingZero(hours);
@@ -78,18 +74,16 @@ function printDate() {
 }
 
 function onClickCountTime() {
-  refs.buttonEl.disabled = true;
-  printDate();
-  const timer = setInterval(newDatePrint, 1000);
-
-  function newDatePrint() {
-    timeDifferenceObject = convertMs((timeDifference -= 1000));
+  buttonEl.disabled = true;
+  // printDate();
+  const timer = setInterval(() => {
+    deltaObject = convertMs((delta -= 1000));
     printDate();
-    if (timeDifference < 1000) {
+    if (delta < 1000) {
       clearInterval(timer);
-      timeDifference = 0;
+      delta = 0;
     }
-  }
+  }, 1000);
 }
 
-flatpickr('input#datetime-picker', options);
+flatpickr(inputEl, options);
